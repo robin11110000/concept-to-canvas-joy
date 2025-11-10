@@ -3,6 +3,9 @@ import { FeaturedManga } from "@/components/FeaturedManga";
 import { MangaCard } from "@/components/MangaCard";
 import { BottomNav } from "@/components/BottomNav";
 import { SocialLinks } from "@/components/SocialLinks";
+import { ConnectButton } from "thirdweb/react";
+import { createThirdwebClient } from "thirdweb";
+import { inAppWallet, createWallet } from "thirdweb/wallets";
 import featuredImage from "@/assets/featured-manga.jpg";
 import manga1 from "@/assets/manga-1.jpg";
 import manga2 from "@/assets/manga-2.jpg";
@@ -13,6 +16,32 @@ import manga6 from "@/assets/manga-6.jpg";
 import manga7 from "@/assets/manga-7.jpg";
 import manga8 from "@/assets/manga-8.jpg";
 import manga9 from "@/assets/manga-9.jpg";
+
+const client = createThirdwebClient({
+  clientId: "....",
+});
+
+const wallets = [
+  inAppWallet({
+    auth: {
+      options: [
+        "google",
+        "discord",
+        "telegram",
+        "farcaster",
+        "email",
+        "x",
+        "passkey",
+        "phone",
+      ],
+    },
+  }),
+  createWallet("io.metamask"),
+  createWallet("com.coinbase.wallet"),
+  createWallet("me.rainbow"),
+  createWallet("io.rabby"),
+  createWallet("io.zerion.wallet"),
+];
 
 const Index = () => {
   const recommendations = [
@@ -39,9 +68,11 @@ const Index = () => {
           <button className="text-muted-foreground hover:text-foreground transition-colors">
             <Search className="w-5 h-5" />
           </button>
-          <button className="w-10 h-10 bg-card rounded-full flex items-center justify-center shadow-glow">
-            <User className="w-5 h-5 text-primary" />
-          </button>
+          <ConnectButton
+            client={client}
+            connectModal={{ size: "compact" }}
+            wallets={wallets}
+          />
         </div>
       </header>
 
