@@ -1,8 +1,12 @@
 import { Search, User } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FeaturedManga } from "@/components/FeaturedManga";
 import { MangaCard } from "@/components/MangaCard";
 import { BottomNav } from "@/components/BottomNav";
 import { SocialLinks } from "@/components/SocialLinks";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import featuredImage from "@/assets/featured-manga.jpg";
 import manga1 from "@/assets/manga-1.jpg";
 import manga2 from "@/assets/manga-2.jpg";
@@ -15,6 +19,9 @@ import manga8 from "@/assets/manga-8.jpg";
 import manga9 from "@/assets/manga-9.jpg";
 
 const Index = () => {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
   const recommendations = [
     { id: 1, image: manga1, title: "My lucky star", genre: "Romance" },
     { id: 2, image: manga2, title: "Only you", genre: "Drama" },
@@ -27,6 +34,12 @@ const Index = () => {
     { id: 9, image: manga9, title: "Little flower", genre: "Romance" },
   ];
 
+  const filteredResults = recommendations.filter(
+    (manga) =>
+      manga.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      manga.genre.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-gradient-primary pb-24">
       {/* Header */}
@@ -36,10 +49,16 @@ const Index = () => {
         </div>
         <h1 className="text-xl font-bold text-foreground">My readings</h1>
         <div className="flex items-center gap-3">
-          <button className="text-muted-foreground hover:text-foreground transition-colors">
+          <button 
+            onClick={() => setIsSearchOpen(true)}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             <Search className="w-5 h-5" />
           </button>
-          <button className="w-10 h-10 bg-card rounded-full flex items-center justify-center shadow-glow">
+          <button 
+            onClick={() => navigate("/settings")}
+            className="w-10 h-10 bg-card rounded-full flex items-center justify-center shadow-glow"
+          >
             <User className="w-5 h-5 text-primary" />
           </button>
         </div>
@@ -81,6 +100,39 @@ const Index = () => {
 
       {/* Bottom Navigation */}
       <BottomNav />
+
+      {/* Search Dialog */}
+      <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Search Manga</DialogTitle>
+          </DialogHeader>
+          <Input
+            placeholder="Search by title or genre..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="mb-4"
+          />
+          <div className="max-h-96 overflow-y-auto">
+            {filteredResults.length > 0 ? (
+              <div className="grid grid-cols-3 gap-3">
+                {filteredResults.map((manga) => (
+                  <MangaCard
+                    key={manga.id}
+                    image={manga.image}
+                    title={manga.title}
+                    genre={manga.genre}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">
+                No results found
+              </p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
